@@ -1,0 +1,7 @@
+APP_DEBUG=0
+
+DB_PORT=6543
+DB_HOST=database
+DB_USERNAME=dev
+DB_PASSWORD=devdev
+DB_DATABASE=delivery_service

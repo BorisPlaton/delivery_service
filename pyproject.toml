@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "delivery-service"
+version = "0.1.0"
+description = ""
+authors = ["Kirill <pnchkirill@gmail.com>"]
+readme = "README.md"
+packages = [{include = "delivery_service"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.110.1"
+uvicorn = "^0.29.0"
+sqlalchemy = "^2.0.29"
+typer = "^0.12.3"
+punq = "^0.7.0"
+pydantic-settings = "^2.2.1"
+fastapi-pagination = "^0.12.23"
+alembic = "^1.13.1"
+asyncpg = "^0.29.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
