@@ -54,7 +54,7 @@ class OrderCustomer(IdMixin, Base):
         second_name: str | None,
         phone_number: str,
         email: str,
-        order_id: int,
+        order_id: int | None,
     ) -> Self:
         return cls(
             _first_name=first_name,

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from decimal import Decimal
+from typing import Annotated
+
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -8,12 +11,24 @@ from domain.order.command.save_order.command import OrderItemCommandInput
 from domain.order.command.save_order.command import SaveOrderCommand
 from domain.order.command.save_order.command import ShippingInfoCommandInput
 from domain.order.model.order import OrderStatus
+from shared.pydantic_.enum_.validator import enum_name_validator
 
 
 class SaveOrderInput(BaseModel):
-    order_id: int | None = Field(serialization_alias='id', validation_alias='id')
-    description: str | None
-    status: OrderStatus
+    order_id: int | None = Field(
+        serialization_alias='id',
+        validation_alias='id',
+        examples=[1],
+        ge=1,
+    )
+    description: str | None = Field(
+        examples=["This is an order with the books for my friend."],
+        max_length=512,
+    )
+    status: Annotated[OrderStatus, enum_name_validator(OrderStatus)] = Field(
+        examples=[OrderStatus.NEW.name],
+
+    )
     items: list[OrderItemInput]
     shipping: ShippingInfoInput
     customer: CustomerInfoInput
@@ -30,23 +45,44 @@ class SaveOrderInput(BaseModel):
 
 
 class OrderItemInput(BaseModel):
-    title: str
-    price: str
-    quantity: int
+    title: str = Field(
+        examples=["Book"],
+        max_length=256,
+    )
+    price: Decimal = Field(
+        examples=[59.99],
+        decimal_places=2,
+    )
+    quantity: int = Field(
+        examples=[2],
+        ge=1,
+    )
+    currency: str = Field(
+        examples=["$"],
+    )
 
     def to_command_input(self) -> OrderItemCommandInput:
         return OrderItemCommandInput(
             title=self.title,
-            price=self.price,
+            price=float(self.price),
             quantity=self.quantity,
+            currency=self.currency,
         )
 
 
 class ShippingInfoInput(BaseModel):
-    country: str
-    city: str
-    street: str
-    post_code: str
+    country: str = Field(
+        examples=["Ukraine"],
+    )
+    city: str = Field(
+        examples=["Dnipro"],
+    )
+    street: str = Field(
+        examples=["Nezalejna"]
+    )
+    post_code: str = Field(
+        examples=["49000"],
+    )
 
     def to_command_input(self) -> ShippingInfoCommandInput:
         return ShippingInfoCommandInput(
@@ -58,10 +94,20 @@ class ShippingInfoInput(BaseModel):
 
 
 class CustomerInfoInput(BaseModel):
-    first_name: str | None
-    second_name: str | None
-    phone_number: str
-    email: str
+    first_name: str | None = Field(
+        examples=["Diana"],
+    )
+    second_name: str | None = Field(
+        examples=["Stezhka"]
+    )
+    phone_number: str = Field(
+        examples=["+380661235454"],
+        min_length=10,
+        max_length=14,
+    )
+    email: str = Field(
+        examples=["customer@gmail.com"],
+    )
 
     def to_command_input(self) -> CustomerInfoCommandInput:
         return CustomerInfoCommandInput(

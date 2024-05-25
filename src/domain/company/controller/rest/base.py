@@ -3,9 +3,10 @@ from fastapi import APIRouter
 from domain.company.controller.rest.v1.api import router as v1_router
 
 
+tag = 'Company'
 company_router = APIRouter(
     prefix='/company',
-    tags=['Company'],
+    tags=[tag],
 )
 
 company_router.include_router(

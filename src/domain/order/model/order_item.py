@@ -45,7 +45,7 @@ class OrderItem(IdMixin, Base):
         title: str,
         quantity: int,
         currency: str,
-        order_id: int,
+        order_id: int | None,
     ) -> Self:
         return cls(
             _price=price,

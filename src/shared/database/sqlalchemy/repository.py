@@ -5,6 +5,9 @@ from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import lazyload
+from sqlalchemy.orm import selectinload
 
 from shared.database.repository.interface import IAsyncCRUDRepository
 from shared.database.sqlalchemy.connection.async_connection import AsyncSQLAlchemyConnection
@@ -29,6 +32,8 @@ class AsyncSQLAlchemyRepository[T, U: IdMixin](
             self.entity_class.id == id_,
         ).execution_options(
             populate_existing=True,
+        ).options(
+            selectinload('*'),
         )
         return await self._scalar(statement)
 
@@ -39,6 +44,8 @@ class AsyncSQLAlchemyRepository[T, U: IdMixin](
             self.entity_class.id.in_(ids),
         ).execution_options(
             populate_existing=True,
+        ).options(
+            selectinload('*'),
         )
         return await self._scalars(statement)
 
@@ -47,12 +54,14 @@ class AsyncSQLAlchemyRepository[T, U: IdMixin](
             self.entity_class
         ).execution_options(
             populate_existing=True,
+        ).options(
+            selectinload('*'),
         )
         return await self._scalars(statement)
 
     async def delete(self, entity: U) -> None:
         async with self._conn_provider.connect() as session:
-            session.delete(entity)
+            await session.delete(entity)
             await session.flush()
 
     async def update(self, entity: U) -> None:

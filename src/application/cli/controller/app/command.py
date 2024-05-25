@@ -27,4 +27,5 @@ def up(
         port=port,
         workers=workers,
         reload=debug,
+        factory=True,
     )

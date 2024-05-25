@@ -19,7 +19,7 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
         self,
         command: SaveOrderCommand,
     ) -> int:
-        order = await self._order_repository.get(id_=command.order_id)
+        order: Order = await self._order_repository.get(id_=command.order_id)
 
         if not order:
             order = await self._create_order(
@@ -40,18 +40,19 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
         order = Order.create(
             description=command.description,
             status=command.status,
-            shipping=OrderShipping.create(
-                country=command.shipping.country,
-                city=command.shipping.city,
-                post_code=command.shipping.post_code,
-                order=None,
-            ),
             customer=OrderCustomer.create(
                 first_name=command.customer.first_name,
                 second_name=command.customer.second_name,
                 email=command.customer.email,
                 phone_number=command.customer.phone_number,
-                order=None,
+                order_id=None,
+            ),
+            shipping=OrderShipping.create(
+                country=command.shipping.country,
+                city=command.shipping.city,
+                post_code=command.shipping.post_code,
+                street=command.shipping.street,
+                order_id=None,
             ),
             items=[
                 OrderItem.create(
@@ -59,7 +60,7 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
                     title=item.title,
                     quantity=item.quantity,
                     currency=item.currency,
-                    order=None,
+                    order_id=None,
                 ) for item in command.items
             ],
         )
@@ -73,7 +74,27 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
     ) -> None:
         order.description = command.description
         order.status = command.status
-        order.shipping = command.shipping
-        order.customer = command.customer
-        order.items = command.items
+        order.shipping = OrderShipping.create(
+            country=command.shipping.country,
+            city=command.shipping.city,
+            post_code=command.shipping.post_code,
+            order_id=order.id,
+            street=command.shipping.street,
+        )
+        order.customer = OrderCustomer.create(
+            first_name=command.customer.first_name,
+            second_name=command.customer.second_name,
+            email=command.customer.email,
+            phone_number=command.customer.phone_number,
+            order_id=order.id,
+        )
+        order.items = [
+            OrderItem.create(
+                price=item.price,
+                title=item.title,
+                quantity=item.quantity,
+                currency=item.currency,
+                order_id=order.id,
+            ) for item in command.items
+        ]
         await self._order_repository.update(order)

@@ -5,7 +5,6 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-from domain.order.model.order import Order
 from shared.database.sqlalchemy.base import Base
 from shared.database.sqlalchemy.mixins import IdMixin
 
@@ -34,6 +33,13 @@ class OrderShipping(IdMixin, Base):
         name='post_code',
         nullable=False,
     )
+    _street: Mapped[str] = mapped_column(
+        String(
+            length=128,
+        ),
+        name='street',
+        nullable=False,
+    )
     _order_id: Mapped[int] = mapped_column(
         ForeignKey("order.id", ondelete="CASCADE", onupdate="CASCADE"),
         name="order_id",
@@ -47,12 +53,14 @@ class OrderShipping(IdMixin, Base):
         country: str,
         city: str,
         post_code: str,
-        order_id: Order | None,
+        street: str,
+        order_id: int | None,
     ) -> Self:
         return cls(
             _country=country,
             _city=city,
             _post_code=post_code,
+            _street=street,
             _order_id=order_id,
         )
 
@@ -67,3 +75,7 @@ class OrderShipping(IdMixin, Base):
     @property
     def post_code(self) -> str:
         return self._post_code
+
+    @property
+    def street(self) -> str:
+        return self._street

@@ -6,8 +6,10 @@ from fastapi import Request
 from punq import Container
 
 from domain.company.controller.rest.base import company_router
+from domain.company.controller.rest.base import tag as company_tag
 from domain.module import DomainModule
 from domain.order.controller.rest.base import order_router
+from domain.order.controller.rest.base import tag as order_tag
 from settings.config import ApplicationSettings
 from settings.module import SettingsModule
 from shared.module import SharedModule
@@ -36,6 +38,16 @@ def create_app() -> FastAPI:
         debug=modules_config.container.resolve(ApplicationSettings).DEBUG,
         description="The backend application for automation business-process of the delivery company.",
         version="1.0.0",
+        openapi_tags=[
+            {
+                "name": order_tag,
+                "description": "Operations with orders. This section has basic CRUD operations for orders.",
+            },
+            {
+                "name": company_tag,
+                "description": "Operations with orders. This section has basic CRUD operations for companies.",
+            },
+        ],
     )
     app.include_router(order_router)
     app.include_router(company_router)

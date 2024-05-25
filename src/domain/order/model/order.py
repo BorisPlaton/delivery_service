@@ -46,12 +46,15 @@ class Order(IdMixin, Base):
     )
 
     _items: Mapped[list[OrderItem]] = relationship(
+        lazy="select",
         cascade='all, delete-orphan',
     )
     _shipping: Mapped[OrderShipping] = relationship(
+        lazy="select",
         cascade='all, delete-orphan',
     )
     _customer: Mapped[OrderCustomer] = relationship(
+        lazy="select",
         cascade='all, delete-orphan',
     )
 
@@ -60,9 +63,9 @@ class Order(IdMixin, Base):
         cls,
         description: str | None,
         status: OrderStatus,
-        items: list[OrderItem],
-        shipping: OrderShipping,
-        customer: OrderCustomer,
+        items: list[OrderItem] | None,
+        shipping: OrderShipping | None,
+        customer: OrderCustomer | None,
     ) -> Self:
         return cls(
             _description=description,
@@ -98,7 +101,7 @@ class Order(IdMixin, Base):
 
     @property
     def items(self) -> list[OrderItem]:
-        return self.items
+        return self._items
 
     @items.setter
     def items(
