@@ -11,6 +11,7 @@ class SaveOrderCommand(ICommand):
     order_id: int | None
     description: str | None
     status: OrderStatus
+    company_id: int
     items: list[OrderItemCommandInput]
     shipping: ShippingInfoCommandInput
     customer: CustomerInfoCommandInput

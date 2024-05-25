@@ -4,7 +4,6 @@ from decimal import Decimal
 from typing import Annotated
 
 from pydantic import BaseModel
-from pydantic import ConfigDict
 from pydantic import Field
 
 from domain.order.model.order import OrderStatus
@@ -12,8 +11,6 @@ from shared.pydantic_.enum_.serializer import EnumNameSerializer
 
 
 class OrderOutput(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     order_id: int = Field(
         serialization_alias='id',
         validation_alias='id',
@@ -26,6 +23,9 @@ class OrderOutput(BaseModel):
     )
     status: Annotated[OrderStatus, EnumNameSerializer] = Field(
         examples=[OrderStatus.NEW.name],
+    )
+    company_id: int = Field(
+        examples=[1],
     )
     items: list[OrderItemOutput]
     shipping: OrderShippingOutput

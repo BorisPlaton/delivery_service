@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e1e85eee487d
+Revision ID: 77a928bba2f1
 Revises: 
-Create Date: 2024-05-25 16:02:51.001297
+Create Date: 2024-05-25 22:22:11.865574
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e1e85eee487d'
+revision: str = '77a928bba2f1'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -34,9 +34,12 @@ def upgrade() -> None:
             'status', sa.Enum('NEW', 'PROCESSING', 'DELIVERED', 'FINISHED', 'CANCELLED', name='orderstatus'),
             nullable=False
         ),
+        sa.Column('company_id', sa.Integer(), nullable=False),
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(['company_id'], ['company.id'], onupdate='CASCADE', ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_order_company_id'), 'order', ['company_id'], unique=False)
     op.create_table(
         'order_customer',
         sa.Column('first_name', sa.String(length=32), nullable=True),
@@ -84,6 +87,7 @@ def downgrade() -> None:
     op.drop_table('order_item')
     op.drop_index(op.f('ix_order_customer_order_id'), table_name='order_customer')
     op.drop_table('order_customer')
+    op.drop_index(op.f('ix_order_company_id'), table_name='order')
     op.drop_table('order')
     op.drop_table('company')
     # ### end Alembic commands ###

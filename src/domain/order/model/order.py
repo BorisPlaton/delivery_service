@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from enum import Enum
 from enum import auto
 
+from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped
@@ -44,6 +45,16 @@ class Order(IdMixin, Base):
         name='status',
         nullable=False,
     )
+    _company_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            column="company.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
+        name="company_id",
+        index=True,
+        nullable=False,
+    )
 
     _items: Mapped[list[OrderItem]] = relationship(
         lazy="select",
@@ -66,10 +77,12 @@ class Order(IdMixin, Base):
         items: list[OrderItem] | None,
         shipping: OrderShipping | None,
         customer: OrderCustomer | None,
+        company_id: int,
     ) -> Self:
         return cls(
             _description=description,
             _status=status,
+            _company_id=company_id,
             _items=items,
             _shipping=shipping,
             _customer=customer,
@@ -98,6 +111,18 @@ class Order(IdMixin, Base):
     ) -> None:
         self: Self
         self._status = status
+
+    @property
+    def company_id(self) -> int:
+        return self._company_id
+
+    @company_id.setter
+    def company_id(
+        self,
+        company_id: int,
+    ) -> None:
+        self: Self
+        self._company_id = company_id
 
     @property
     def items(self) -> list[OrderItem]:

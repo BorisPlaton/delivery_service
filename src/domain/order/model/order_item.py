@@ -32,7 +32,11 @@ class OrderItem(IdMixin, Base):
         nullable=False,
     )
     _order_id: Mapped[int] = mapped_column(
-        ForeignKey("order.id", ondelete="CASCADE", onupdate="CASCADE"),
+        ForeignKey(
+            "order.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
         name="order_id",
         index=True,
         nullable=False,

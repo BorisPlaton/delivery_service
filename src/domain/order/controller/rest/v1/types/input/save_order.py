@@ -29,6 +29,10 @@ class SaveOrderInput(BaseModel):
         examples=[OrderStatus.NEW.name],
 
     )
+    company_id: int = Field(
+        examples=[1],
+        ge=1,
+    )
     items: list[OrderItemInput]
     shipping: ShippingInfoInput
     customer: CustomerInfoInput
@@ -38,6 +42,7 @@ class SaveOrderInput(BaseModel):
             order_id=self.order_id,
             description=self.description,
             status=self.status,
+            company_id=self.company_id,
             items=[item.to_command_input() for item in self.items],
             shipping=self.shipping.to_command_input(),
             customer=self.customer.to_command_input(),

@@ -40,6 +40,7 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
         order = Order.create(
             description=command.description,
             status=command.status,
+            company_id=command.company_id,
             customer=OrderCustomer.create(
                 first_name=command.customer.first_name,
                 second_name=command.customer.second_name,
@@ -74,6 +75,7 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
     ) -> None:
         order.description = command.description
         order.status = command.status
+        order.company_id = command.company_id
         order.shipping = OrderShipping.create(
             country=command.shipping.country,
             city=command.shipping.city,

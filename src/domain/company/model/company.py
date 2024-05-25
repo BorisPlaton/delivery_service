@@ -5,7 +5,9 @@ from typing import Self
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
+from domain.order.model.order import Order
 from shared.database.sqlalchemy.base import Base
 from shared.database.sqlalchemy.mixins import IdMixin
 
@@ -26,6 +28,11 @@ class Company(IdMixin, Base):
         ),
         name='description',
         nullable=True,
+    )
+
+    orders: Mapped[list[Order]] = relationship(
+        lazy="select",
+        cascade='all, delete-orphan',
     )
 
     @classmethod
