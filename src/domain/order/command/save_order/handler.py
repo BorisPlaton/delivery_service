@@ -1,4 +1,7 @@
+from domain.company.repository.interface import ICompanyRepository
 from domain.order.command.save_order.command import SaveOrderCommand
+from domain.order.exception.order_cant_be_created_due_to_company_doesnt_exist import \
+    OrderCantBeCreatedDueToCompanyDoesNotExist
 from domain.order.model.order import Order
 from domain.order.model.order_customer import OrderCustomer
 from domain.order.model.order_item import OrderItem
@@ -12,13 +15,16 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
     def __init__(
         self,
         order_repository: IOrderRepository,
+        company_repository: ICompanyRepository,
     ):
         self._order_repository = order_repository
+        self._company_repository = company_repository
 
     async def __call__(
         self,
         command: SaveOrderCommand,
     ) -> int:
+        await self._validate_company_exist(company_id=command.company_id)
         order: Order = await self._order_repository.get(id_=command.order_id)
 
         if not order:
@@ -41,6 +47,8 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
             description=command.description,
             status=command.status,
             company_id=command.company_id,
+            finished_at=command.finished_at,
+            finished_to=command.finished_to,
             customer=OrderCustomer.create(
                 first_name=command.customer.first_name,
                 second_name=command.customer.second_name,
@@ -76,6 +84,8 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
         order.description = command.description
         order.status = command.status
         order.company_id = command.company_id
+        order.finished_at = command.finished_at
+        order.finished_to = command.finished_to
         order.shipping = OrderShipping.create(
             country=command.shipping.country,
             city=command.shipping.city,
@@ -100,3 +110,10 @@ class SaveOrderCommandHandler(ICommandHandler[int, SaveOrderCommand]):
             ) for item in command.items
         ]
         await self._order_repository.update(order)
+
+    async def _validate_company_exist(
+        self,
+        company_id: int,
+    ) -> None:
+        if not await self._company_repository.get(id_=company_id):
+            raise OrderCantBeCreatedDueToCompanyDoesNotExist()

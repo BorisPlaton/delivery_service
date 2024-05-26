@@ -59,6 +59,7 @@ class DomainModule(IModule):
             message=SaveOrderCommand,
             handler=SaveOrderCommandHandler(
                 order_repository=container.resolve(IOrderRepository),
+                company_repository=container.resolve(ICompanyRepository),
             ),
         )
         command_bus.register(

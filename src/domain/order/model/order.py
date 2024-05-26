@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Self
 from typing import TYPE_CHECKING
 from enum import Enum
@@ -8,6 +9,7 @@ from enum import auto
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy import Enum as SQLAlchemyEnum
+from sqlalchemy import func
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -55,6 +57,14 @@ class Order(IdMixin, Base):
         index=True,
         nullable=False,
     )
+    _finished_at: Mapped[datetime] = mapped_column(
+        name="finished_at",
+        nullable=True,
+    )
+    _finished_to: Mapped[datetime] = mapped_column(
+        name="finished_to",
+        nullable=False,
+    )
 
     _items: Mapped[list[OrderItem]] = relationship(
         lazy="select",
@@ -78,14 +88,18 @@ class Order(IdMixin, Base):
         shipping: OrderShipping | None,
         customer: OrderCustomer | None,
         company_id: int,
+        finished_to: datetime,
+        finished_at: datetime | None,
     ) -> Self:
         return cls(
             _description=description,
-            _status=status,
+            _status=OrderStatus.FINISHED if finished_at else status,
             _company_id=company_id,
             _items=items,
             _shipping=shipping,
             _customer=customer,
+            _finished_to=finished_to,
+            _finished_at=finished_at,
         )
 
     @property
@@ -123,6 +137,32 @@ class Order(IdMixin, Base):
     ) -> None:
         self: Self
         self._company_id = company_id
+
+    @property
+    def finished_to(self) -> datetime:
+        return self._finished_to
+
+    @finished_to.setter
+    def finished_to(
+        self,
+        finished_to: datetime,
+    ) -> None:
+        self: Self
+        self._finished_to = finished_to
+
+    @property
+    def finished_at(self) -> datetime | None:
+        return self._finished_at
+
+    @finished_at.setter
+    def finished_at(
+        self,
+        finished_at: datetime,
+    ) -> None:
+        self: Self
+        self._finished_to = finished_at
+        if finished_at:
+            self._status = OrderStatus.FINISHED
 
     @property
     def items(self) -> list[OrderItem]:

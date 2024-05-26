@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import BaseModel
@@ -21,3 +22,10 @@ class CompanyOrderOutput(BaseModel):
     status: Annotated[OrderStatus, EnumNameSerializer] = Field(
         examples=[OrderStatus.NEW.name],
     )
+    finished_to: datetime = Field(
+        examples=[datetime.now()],
+    )
+    finished_at: datetime | None = Field(
+        examples=[datetime.now()],
+    )
+

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -26,6 +27,12 @@ class OrderOutput(BaseModel):
     )
     company_id: int = Field(
         examples=[1],
+    )
+    finished_to: datetime = Field(
+        examples=[datetime.now()],
+    )
+    finished_at: datetime | None = Field(
+        examples=[datetime.now()],
     )
     items: list[OrderItemOutput]
     shipping: OrderShippingOutput
@@ -85,4 +92,16 @@ class OrderCustomerOutput(BaseModel):
     )
     email: str = Field(
         examples=["customer@gmail.com"],
+    )
+
+
+class OverdueOrderOutput(BaseModel):
+    order_id: int = Field(
+        serialization_alias='id',
+        validation_alias='id',
+        examples=[1],
+        ge=1,
+    )
+    finished_to: datetime = Field(
+        examples=[datetime.now()],
     )

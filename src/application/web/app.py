@@ -12,6 +12,8 @@ from domain.order.controller.rest.base import order_router
 from domain.order.controller.rest.base import tag as order_tag
 from settings.config import ApplicationSettings
 from settings.module import SettingsModule
+from shared.exception.base import BaseAppException
+from shared.fastapi_.exception.factory import exception_factory
 from shared.module import SharedModule
 from shared.module_setup.bootstrap import ModulesConfig
 
@@ -59,5 +61,12 @@ def create_app() -> FastAPI:
     ) -> T:
         request.state.registry = modules_config.container
         return await call_next(request)
+
+    @app.exception_handler(BaseAppException)
+    def base_app_exception_handler(
+        request: Request,
+        exc: BaseAppException,
+    ) -> None:
+        raise exception_factory(exc=exc)
 
     return app

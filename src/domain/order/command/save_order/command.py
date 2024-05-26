@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 
 from domain.order.model.order import OrderStatus
 from shared.message_bus.command_bus.interface.command import ICommand
@@ -12,6 +13,8 @@ class SaveOrderCommand(ICommand):
     description: str | None
     status: OrderStatus
     company_id: int
+    finished_to: datetime
+    finished_at: datetime | None
     items: list[OrderItemCommandInput]
     shipping: ShippingInfoCommandInput
     customer: CustomerInfoCommandInput

@@ -16,4 +16,5 @@ class DeleteOrderCommandHandler(ICommandHandler[None, DeleteOrderCommand]):
         command: DeleteOrderCommand,
     ) -> None:
         order = await self._order_repository.get(id_=command.order_id)
-        await self._order_repository.delete(order)
+        if order:
+            await self._order_repository.delete(order)

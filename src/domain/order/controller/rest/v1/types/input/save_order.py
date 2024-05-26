@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -33,6 +34,12 @@ class SaveOrderInput(BaseModel):
         examples=[1],
         ge=1,
     )
+    finished_to: datetime = Field(
+        examples=[datetime.now()],
+    )
+    finished_at: datetime | None = Field(
+        examples=[datetime.now()],
+    )
     items: list[OrderItemInput]
     shipping: ShippingInfoInput
     customer: CustomerInfoInput
@@ -42,6 +49,8 @@ class SaveOrderInput(BaseModel):
             order_id=self.order_id,
             description=self.description,
             status=self.status,
+            finished_to=self.finished_to,
+            finished_at=self.finished_at,
             company_id=self.company_id,
             items=[item.to_command_input() for item in self.items],
             shipping=self.shipping.to_command_input(),

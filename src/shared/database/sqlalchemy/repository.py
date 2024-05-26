@@ -59,6 +59,21 @@ class AsyncSQLAlchemyRepository[T, U: IdMixin](
         )
         return await self._scalars(statement)
 
+    async def get_all_by_filter(
+        self,
+        filter_,
+    ) -> list[U]:
+        statement = select(
+            self.entity_class
+        ).execution_options(
+            populate_existing=True,
+        ).where(
+            filter_,
+        ).options(
+            selectinload('*'),
+        )
+        return await self._scalars(statement)
+
     async def delete(self, entity: U) -> None:
         async with self._conn_provider.connect() as session:
             await session.delete(entity)
